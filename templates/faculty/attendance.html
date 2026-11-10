@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Attendance - Faculty Portal{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Record & Update Student Attendance</h3>
+        <p class="text-muted small mb-0">Select your course and date to record daily presence and remarks</p>
+    </div>
+</div>
+
+<!-- Selection Filter Card -->
+<div class="card p-3 mb-4">
+    <form method="GET" action="{{ url_for('faculty.attendance') }}" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold">Select Course</label>
+            <select name="course_id" class="form-select" onchange="this.form.submit()">
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if c.id == selected_course_id %}selected{% endif %}>
+                        {{ c.course_code }}: {{ c.course_name }} ({{ c.enrollments|length }} students)
+                    </option>
+                {% else %}
+                    <option value="" disabled>No assigned courses</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Attendance Date</label>
+            <input type="date" name="date" class="form-control" value="{{ selected_date_str }}" onchange="this.form.submit()">
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-outline-primary w-100">
+                <i class="bi bi-arrow-repeat me-1"></i> Refresh List
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if selected_course %}
+<div class="card p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-calendar2-check text-primary me-2"></i>
+                {{ selected_course.course_code }} - {{ selected_course.course_name }}
+            </h5>
+            <small class="text-muted">Date: <strong>{{ selected_date_str }}</strong> &bull; Total Enrolled: {{ students_with_status|length }}</small>
+        </div>
+
+        <!-- Quick bulk selection buttons -->
+        <div class="btn-group btn-group-sm mt-2 mt-md-0" role="group">
+            <button type="button" class="btn btn-outline-success" onclick="bulkSetStatus('Present')">
+                <i class="bi bi-check-all"></i> Mark All Present
+            </button>
+            <button type="button" class="btn btn-outline-danger" onclick="bulkSetStatus('Absent')">
+                <i class="bi bi-x"></i> Mark All Absent
+            </button>
+        </div>
+    </div>
+
+    {% if students_with_status %}
+    <form method="POST" action="{{ url_for('faculty.attendance') }}">
+        <input type="hidden" name="course_id" value="{{ selected_course.id }}">
+        <input type="hidden" name="date" value="{{ selected_date_str }}">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-4">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Roll Number</th>
+                        <th style="width: 25%;">Student Name</th>
+                        <th style="width: 35%;">Attendance Status</th>
+                        <th style="width: 25%;">Remarks (Optional)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in students_with_status %}
+                    {% set stu = item.student %}
+                    <tr>
+                        <td><code>{{ stu.roll_number }}</code></td>
+                        <td>
+                            <div class="fw-semibold">{{ stu.name }}</div>
+                            <div class="text-muted small">{{ stu.email }}</div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input status-radio" type="radio" 
+                                           name="status_{{ stu.id }}" id="pres_{{ stu.id }}" 
+                                           value="Present" {% if item.status == 'Present' %}checked{% endif %}>
+                                    <label class="form-check-label text-success fw-medium" for="pres_{{ stu.id }}">Present</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input status-radio" type="radio" 
+                                           name="status_{{ stu.id }}" id="abs_{{ stu.id }}" 
+                                           value="Absent" {% if item.status == 'Absent' %}checked{% endif %}>
+                                    <label class="form-check-label text-danger fw-medium" for="abs_{{ stu.id }}">Absent</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input status-radio" type="radio" 
+                                           name="status_{{ stu.id }}" id="late_{{ stu.id }}" 
+                                           value="Late" {% if item.status == 'Late' %}checked{% endif %}>
+                                    <label class="form-check-label text-warning fw-medium" for="late_{{ stu.id }}">Late</label>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" name="remarks_{{ stu.id }}" class="form-control form-control-sm" 
+                                   value="{{ item.remarks }}" placeholder="e.g. Leave note, sick, excused">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-save me-1"></i> Save Attendance Records
+            </button>
+        </div>
+    </form>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-people fs-1 text-secondary mb-2 d-block"></i>
+        <p class="mb-1 fw-semibold">No students enrolled in this course yet.</p>
+        <small>The administrator can enroll students into {{ selected_course.course_code }}.</small>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="card p-5 text-center text-muted">
+    <i class="bi bi-journal-x fs-1 mb-2 d-block text-secondary"></i>
+    <h5>No Courses Available</h5>
+    <p class="small">You do not have any teaching courses assigned. Contact the administrator.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function bulkSetStatus(statusVal) {
+    const radios = document.querySelectorAll('.status-radio');
+    radios.forEach(radio => {
+        if (radio.value === statusVal) {
+            radio.checked = true;
+        }
+    });
+}
+</script>
+{% endblock %}

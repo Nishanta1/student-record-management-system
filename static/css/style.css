@@ -1,0 +1,76 @@
+/* Custom modern styling for Student Record Management System */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #475569;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.card {
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: var(--card-shadow);
+}
+
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.badge-role-admin {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    font-weight: 600;
+}
+
+.badge-role-faculty {
+    background-color: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    font-weight: 600;
+}
+
+.table th {
+    font-size: 0.825rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background-color: #f8fafc;
+}
+
+.quick-cred-pill {
+    cursor: pointer;
+    font-size: 0.82rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.quick-cred-pill:hover {
+    background-color: #e2e8f0;
+}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard - Student Record Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Welcome, {{ current_user.full_name }}</h3>
+        <p class="text-muted small mb-0">Faculty Portal &bull; Department of {{ faculty.department }} &bull; Employee ID: <code>{{ faculty.employee_id }}</code></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('faculty.attendance') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-calendar-check me-1"></i> Take Attendance
+        </a>
+        <a href="{{ url_for('faculty.assignments') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-file-earmark-plus me-1"></i> New Assignment
+        </a>
+    </div>
+</div>
+
+<!-- Stats Counter Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Assigned Courses</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_courses }}</h3>
+                </div>
+                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3">
+                    <i class="bi bi-journal-check fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Enrolled Students</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_students }}</h3>
+                </div>
+                <div class="p-3 bg-success bg-opacity-10 text-success rounded-3">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Assignments Created</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_assignments }}</h3>
+                </div>
+                <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3">
+                    <i class="bi bi-file-earmark-text fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Attendance Logs</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_attendance_records }}</h3>
+                </div>
+                <div class="p-3 bg-info bg-opacity-10 text-info rounded-3">
+                    <i class="bi bi-check2-all fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Assigned Courses List -->
+    <div class="col-lg-7">
+        <div class="card p-3">
+            <h5 class="fw-bold mb-3"><i class="bi bi-journal-code text-primary me-2"></i> My Teaching Schedule</h5>
+            <div class="row g-3">
+                {% for c in courses %}
+                <div class="col-md-12">
+                    <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-primary mb-1">{{ c.course_code }}</span>
+                            <h6 class="fw-bold mb-1">{{ c.course_name }}</h6>
+                            <div class="text-muted small">
+                                Department: {{ c.department }} &bull; Semester {{ c.semester }} &bull; {{ c.enrollments|length }} Enrolled Students
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('faculty.attendance', course_id=c.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-calendar-check"></i> Attendance
+                            </a>
+                            <a href="{{ url_for('faculty.assignments') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-file-text"></i> Assignments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center py-4 text-muted">
+                    <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                    No courses have been allocated to you yet. Please contact the administrator to assign your courses.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Assignments & Grading -->
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-pencil-square text-primary me-2"></i> Active Assignments</h5>
+                <a href="{{ url_for('faculty.assignments') }}" class="btn btn-sm btn-link text-decoration-none">Manage &rarr;</a>
+            </div>
+            
+            <div class="list-group list-group-flush">
+                {% for asg in recent_assignments %}
+                <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-semibold">{{ asg.title }}</div>
+                        <div class="text-muted small">
+                            Course: <code>{{ asg.course.course_code }}</code> &bull; Due: {{ asg.due_date or 'No deadline' }}
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('faculty.grade_assignment', assignment_id=asg.id) }}" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-award"></i> Grade
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted small">
+                    No assignments created yet.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

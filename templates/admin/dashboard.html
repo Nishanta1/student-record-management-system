@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Student Record Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Admin Master Dashboard</h3>
+        <p class="text-muted small mb-0">Full control & system-wide records overview</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.faculty_list') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> Add Faculty
+        </a>
+        <a href="{{ url_for('admin.student_list') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-person-plus me-1"></i> Add Student
+        </a>
+        <a href="{{ url_for('admin.course_list') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-journal-plus me-1"></i> Manage Courses
+        </a>
+        <a href="{{ url_for('admin.database_viewer') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-database me-1"></i> DB Inspector
+        </a>
+    </div>
+</div>
+
+<!-- Stats Counter Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Total Students</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_students }}</h3>
+                </div>
+                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3">
+                    <i class="bi bi-mortarboard fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Faculty Members</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_faculty }}</h3>
+                </div>
+                <div class="p-3 bg-success bg-opacity-10 text-success rounded-3">
+                    <i class="bi bi-person-badge fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Active Courses</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_courses }}</h3>
+                </div>
+                <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3">
+                    <i class="bi bi-book fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-3 bg-white border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Attendance Logs</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_attendance }}</h3>
+                </div>
+                <div class="p-3 bg-info bg-opacity-10 text-info rounded-3">
+                    <i class="bi bi-calendar2-check fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Faculty List Overview -->
+    <div class="col-lg-7">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-person-workspace text-primary me-2"></i> Faculty Overview</h5>
+                <a href="{{ url_for('admin.faculty_list') }}" class="btn btn-sm btn-link text-decoration-none">View All &rarr;</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Faculty Name</th>
+                            <th>Employee ID</th>
+                            <th>Department</th>
+                            <th>Assigned Courses</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fac in recent_faculty %}
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">{{ fac.user.full_name }}</div>
+                                <div class="text-muted small">{{ fac.user.email }}</div>
+                            </td>
+                            <td><code>{{ fac.employee_id }}</code></td>
+                            <td>{{ fac.department }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ fac.courses|length }} Courses</span>
+                            </td>
+                            <td>
+                                {% if fac.user.is_active %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">No faculty members found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Students List -->
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-people text-primary me-2"></i> Recently Enrolled Students</h5>
+                <a href="{{ url_for('admin.student_list') }}" class="btn btn-sm btn-link text-decoration-none">View All &rarr;</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Sem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stu in recent_students %}
+                        <tr>
+                            <td><code>{{ stu.roll_number }}</code></td>
+                            <td class="fw-semibold">{{ stu.name }}</td>
+                            <td>{{ stu.department }}</td>
+                            <td><span class="badge bg-light text-dark border">Sem {{ stu.semester }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No students found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

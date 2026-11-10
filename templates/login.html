@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Student Record Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center py-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card p-4 shadow-sm">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 bg-primary bg-opacity-10 text-primary rounded-circle mb-2">
+                    <i class="bi bi-shield-lock-fill fs-2"></i>
+                </div>
+                <h4 class="fw-bold mb-1">System Login</h4>
+                <p class="text-muted small">Sign in to manage student records and academic activities</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label small fw-semibold">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label small fw-semibold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                </button>
+            </form>
+
+            <hr class="my-4">
+
+            <!-- Pre-configured Credentials Helper -->
+            <div>
+                <h6 class="fw-bold text-muted small text-uppercase mb-2">
+                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Test Credentials
+                </h6>
+                <p class="text-muted small mb-2">Click any role below to automatically fill the login form:</p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger quick-cred-pill" onclick="fillCreds('admin', 'Admin@12345')">
+                        <i class="bi bi-shield-check"></i> Admin (Master Access)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary quick-cred-pill" onclick="fillCreds('faculty.cs', 'Faculty@123')">
+                        <i class="bi bi-person-badge"></i> Faculty CS (Prof. Sharma)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary quick-cred-pill" onclick="fillCreds('faculty.math', 'Faculty@123')">
+                        <i class="bi bi-person-badge"></i> Faculty Math (Dr. Gupta)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary quick-cred-pill" onclick="fillCreds('faculty.ai', 'Faculty@123')">
+                        <i class="bi bi-person-badge"></i> Faculty AI (Dr. Verma)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Permissions Info Box -->
+        <div class="card mt-3 bg-light border-0 p-3">
+            <h6 class="fw-bold small mb-2"><i class="bi bi-info-circle text-primary me-1"></i> Role Permissions Overview</h6>
+            <ul class="small text-muted mb-0 ps-3">
+                <li><strong>Admin:</strong> Complete system control, add/deactivate faculty, enroll students, allocate courses.</li>
+                <li><strong>Faculty:</strong> Restricted access strictly to assigned courses — mark attendance and grade assignments.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillCreds(user, pass) {
+    document.getElementById('username').value = user;
+    document.getElementById('password').value = pass;
+}
+</script>
+{% endblock %}
